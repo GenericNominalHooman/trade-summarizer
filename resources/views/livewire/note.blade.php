@@ -1,0 +1,167 @@
+<x-slot name="header">
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        {{ __('Trade Weekly Summarizer') }}
+    </h2>
+</x-slot>
+
+<div>
+    <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-200">
+        <div :class="sidebarOpen ? 'block' : 'hidden'" @click="sidebarOpen = false" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden"></div>
+
+        <div :class="sidebarOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-gray-900 lg:translate-x-0 lg:static lg:inset-0">
+
+            <nav class="mt-10">
+                <a class="flex items-center px-6 py-2 mt-4 text-gray-100 bg-gray-700 bg-opacity-25" href="#">
+                    <i class="fa-solid fa-plus"></i>
+                    <button wire:click="updateIsCreateNote(true)" class="mx-3">New Note</button>
+                </a>
+
+                <!-- Listing out all of user's prior note -->
+                @if ($exisitingNote)
+                    @foreach ($exisitingNote as $note)
+                        <a class="flex items-center px-6 py-2 mt-4 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100"
+                        href="#">
+                            <i class="fa-solid fa-list"></i>
+                                
+                            <button wire:click="loadNote({{ $note }})" class="mx-3">{{ $note->title }}</button>
+                        </a>
+                    @endforeach
+                @endif
+
+            </nav>
+        </div>
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
+                {{$is_new_note}}
+                @if ($is_new_note)
+                    <!-- New Note Form -->
+                    <div class="container px-6 py-8 mx-auto">
+                        <h3 class="text-3xl font-medium text-gray-700">{{ __('New Note') }}</h3>
+
+                        <div class="mt-8">
+
+                        </div>
+
+                        <div class="flex flex-col mt-8">
+                            <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                <div
+                                    class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
+                                    <form class="w-full">
+                                        <div class="flex flex-wrap -mx-3 mb-6">
+                                            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="title">
+                                                    Title
+                                                </label>
+                                                <input wire:model="new_title" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Enter title">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex flex-wrap -mx-3 mb-6">
+                                            <div class="w-full px-3">
+                                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="note">
+                                                    Trading Note
+                                                </label>
+                                                <textarea wire:model="new_note" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="6" placeholder="Enter your trading notes"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap -mx-3 mb-6">
+                                            <div class="w-full px-3">
+                                                <button type="button" wire:click="generateSummary" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                    Generate AI Summary
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap -mx-3 mb-6">
+                                            <div class="w-full px-3">
+                                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="summary">
+                                                    AI Generated Summary
+                                                </label>
+                                                <textarea wire:model="new_summary" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="4" placeholder="AI-generated summary will appear here" readonly></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap -mx-3 mb-6">
+                                            <div class="w-full px-3">
+                                                <button wire:click="save" type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                                    Save Note
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    @if ($note)
+                        <!-- Existing Note Form -->
+                        <div class="container px-6 py-8 mx-auto">
+                            <h3 class="text-3xl font-medium text-gray-700">{{ $selected_title }}</h3>
+
+                            <div class="mt-8">
+
+                            </div>
+
+                            <div class="flex flex-col mt-8">
+                                <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                    <div
+                                        class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
+                                        <form class="w-full">
+                                            <div class="flex flex-wrap -mx-3 mb-6">
+                                                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                                                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="title">
+                                                        Title
+                                                    </label>
+                                                    <input wire:model="selected_title" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Enter title">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex flex-wrap -mx-3 mb-6">
+                                                <div class="w-full px-3">
+                                                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="note">
+                                                        Trading Note
+                                                    </label>
+                                                    <textarea wire:model="selected_note" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="6" placeholder="Enter your trading notes"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap -mx-3 mb-6">
+                                                <div class="w-full px-3">
+                                                    <button type="button" wire:click="generateSummary" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                        Generate AI Summary
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap -mx-3 mb-6">
+                                                <div class="w-full px-3">
+                                                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="summary">
+                                                        AI Generated Summary
+                                                    </label>
+                                                    <textarea wire:model="selected_summary" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="4" placeholder="AI-generated summary will appear here" readonly></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap -mx-3 mb-6">
+                                                <div class="w-full p-3 flex justify-begin">
+                                                    <button wire:click="update" type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                                        Update Note
+                                                    </button>
+                                                    <button wire:click="delete" type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                                        Delete Note
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+            </main>
+        </div>
+    </div>
+</div>
