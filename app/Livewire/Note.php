@@ -34,9 +34,6 @@ class Note extends Component
     public function mount()
     {
         $this->exisitingNote = auth()->user()->notes;
-
-        // Default to creating a new note
-        // $this->updateIsCreateNote(true);
     }
 
     public function render()
@@ -77,11 +74,10 @@ class Note extends Component
 
     // Update selected note
     public function update(){
-        // Updating note
         $validatedData = $this->validate([
             'selected_title' => 'required|min:3',
-            // 'selected_summary' => 'nullable',
-            // 'selected_note' => 'nullable'
+            'selected_summary' => 'nullable',
+            'selected_note' => 'nullable'
         ]);
 
         $this->note->update([
@@ -98,39 +94,73 @@ class Note extends Component
     // Generate summary by using openai
     public function generateSummary()
     {
-        // dd($this->new_note); 
-        $this->validate([
-            'new_note' => 'required|min:10'
-        ]);
-
-        try {
-
-            // Create HTTP client with SSL configuration
-            $httpClient = new \GuzzleHttp\Client([
-                'verify' => storage_path('cacert.pem')
+        if(!$this->note){ // Generating summary for new note
+            $this->validate([
+                'new_title' => 'required|min:1',
+                'new_note' => 'required|min:10'
             ]);
-
-            // Create OpenAI client with custom HTTP client
-            $client = \OpenAI::factory()
-                ->withHttpClient($httpClient)
-                ->withApiKey(config('app.openai_api_key'))
-                ->make();
-            
-            $response = $client->chat()->create([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a helpful assistant that summarizes trading notes.'],
-                    ['role' => 'user', 'content' => 'Please summarize this trading note: ' . $this->new_note],
-                ],
-                'max_tokens' => 150
+    
+            try {
+    
+                // Create HTTP client with SSL configuration
+                $httpClient = new \GuzzleHttp\Client([
+                    'verify' => storage_path('cacert.pem')
+                ]);
+    
+                // Create OpenAI client with custom HTTP client
+                $client = \OpenAI::factory()
+                    ->withHttpClient($httpClient)
+                    ->withApiKey(config('app.openai_api_key'))
+                    ->make();
+                
+                $response = $client->chat()->create([
+                    'model' => 'gpt-3.5-turbo',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful assistant that summarizes trading notes.'],
+                        ['role' => 'user', 'content' => 'Please summarize this trading note by lisitng out possible improvements that can be considered: ' . $this->new_note],
+                    ],
+                    'max_tokens' => 350
+                ]);
+    
+                $this->new_summary = $response->choices[0]->message->content;
+                $this->dispatch('summary-generated');
+            } catch (\Exception $e) {
+                dd($e);
+                session()->flash('error', 'Failed to generate summary: ' . $e->getMessage());
+            }
+        }else{ // Re-Generating summary for existing note
+            $this->validate([
+                'selected_title' => 'required|min:1',
+                'selected_note' => 'required|min:10'
             ]);
-
-            $this->new_summary = $response->choices[0]->message->content;
-            // dd($this->new_summary);
-            $this->dispatch('summary-generated');
-        } catch (\Exception $e) {
-            dd($e);
-            session()->flash('error', 'Failed to generate summary: ' . $e->getMessage());
+    
+            try {
+                // Create HTTP client with SSL configuration
+                $httpClient = new \GuzzleHttp\Client([
+                    'verify' => storage_path('cacert.pem')
+                ]);
+    
+                // Create OpenAI client with custom HTTP client
+                $client = \OpenAI::factory()
+                    ->withHttpClient($httpClient)
+                    ->withApiKey(config('app.openai_api_key'))
+                    ->make();
+                
+                $response = $client->chat()->create([
+                    'model' => 'gpt-3.5-turbo',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful assistant that summarizes trading notes.'],
+                        ['role' => 'user', 'content' => 'Please summarize this trading note by lisitng out possible improvements that can be considered: ' . $this->selected_note],
+                    ],
+                    'max_tokens' => 350
+                ]);
+    
+                $this->selected_summary = $response->choices[0]->message->content;
+                $this->dispatch('summary-generated');
+            } catch (\Exception $e) {
+                dd($e);
+                session()->flash('error', 'Failed to generate summary: ' . $e->getMessage());
+            }
         }
     }
 
@@ -138,7 +168,6 @@ class Note extends Component
     {
         $this->note = $note;
         $this->updateIsCreateNote(false); // Set is_new_note to false
-        // dd($this->note);
 
         // Update selected note fields
         $this->selected_title = $this->note->title;
