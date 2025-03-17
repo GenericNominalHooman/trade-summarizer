@@ -14,7 +14,8 @@ class Note extends Model
         'title',
         'summary',
         'note',
-        'user_id'
+        'user_id',
+        'chart_image'
     ];
 
     public function user()
