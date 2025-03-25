@@ -15,7 +15,7 @@ class Note extends Component
     use WithFileUploads;
 
     public $exisitingNote = null;
-    public ?NoteModel $note = null; // Curkrent note selected
+    public ?NoteModel $note = null; // Current note selected
     
     // New Note fields
     public $is_new_note = true;
@@ -27,6 +27,7 @@ class Note extends Component
     
     // Selected Note fields
     public $chart_image = null;
+    public $selected_chart_image = null; // existing image location value from database(path)
     public $selected_title = "";
     public $selected_note = "";
     public $selected_summary = "";
@@ -52,8 +53,8 @@ class Note extends Component
     {
         $validatedData = $this->validate([
             'new_title' => 'required|min:3',
+            'new_note' => 'required|min:10',
             'new_summary' => 'nullable',
-            'new_note' => 'nullable',
             'new_chart_image' => 'nullable|image|max:5120', // 5MB max
         ]);
 
@@ -94,6 +95,8 @@ class Note extends Component
 
     // Update selected note
     public function update(){
+        // PROBLEM OCCURS: chart_image holds image location value 
+        // SOLUTION: chart_image holds existing image location value from database and declare a new variable to store the new image location
         $validatedData = $this->validate([
             'selected_title' => 'required|min:3',
             'selected_summary' => 'nullable',
@@ -130,11 +133,10 @@ class Note extends Component
     {
         if(!$this->note){ // Generating summary for new note
             $this->validate([
-                'new_title' => 'required|min:1',
                 'new_note' => 'required|min:10',
                 'new_chart_image' => 'nullable|image|max:5120', // 5MB max
             ]);
-    
+            
             try {
                 // Create HTTP client with SSL configuration
                 $httpClient = new \GuzzleHttp\Client([
@@ -152,7 +154,7 @@ class Note extends Component
                     ['role' => 'system', 'content' => 'You are a helpful assistant that summarizes trading notes.'],
                     ['role' => 'user', 'content' => 'Please summarize this trading note by listing out possible improvements that can be considered: ' . $this->new_note]
                 ];
-                
+
                 // If there's an image, add it to the message content
                 if ($this->new_chart_image) {
                     // Store the image temporarily
@@ -181,11 +183,16 @@ class Note extends Component
                     ];
                     
                     // Use GPT-4 Vision model if there's an image
-                    $response = $client->chat()->create([
-                        'model' => 'gpt-4-vision-preview',
-                        'messages' => $messages,
-                        'max_tokens' => 350
-                    ]);
+                    try{
+                        $response = $client->chat()->create([
+                            'model' => 'gpt-4o',
+                            'messages' => $messages,
+                            'max_tokens' => 350
+                        ]);
+                    } catch (\Exception $e) {
+                        dd($e->getMessage());
+                        session()->flash('error', 'Failed to generate summary: ' . $e->getMessage());
+                    }
                     
                     // Clean up temporary file
                     \Storage::disk('public')->delete($tempPath);
@@ -306,6 +313,6 @@ class Note extends Component
         $this->selected_summary = $this->note->summary;
         $this->selected_note = $this->note->note;
         $this->selected_aiResponse = $this->note->ai_response;
-        $this->chart_image = $this->note->chart_image;
+        $this->selected_chart_image = $this->note->chart_image;
     }
 }

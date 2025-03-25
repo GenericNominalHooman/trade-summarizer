@@ -63,7 +63,10 @@
                                                                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="title">
                                                                     Title
                                                                 </label>
-                                                                <input wire:model="new_title" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Enter title">
+                                                                <input wire:model="new_title" class="appearance-none block w-full bg-gray-200 text-gray-700 border @error('new_title') border-red-500 @enderror rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Enter title">
+                                                                @error('new_title')
+                                                                    <p class="text-red-500 text-xs italic">Please enter title for the new note.</p>
+                                                                @enderror
                                                             </div>
                                                         </div>
                                                         
@@ -75,9 +78,12 @@
                                                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                                                                     </svg>
                                                                     <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload charts images</span> or drag and drop</p>
-                                                                    <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG only</p>
+                                                                    <p class="text-xs text-gray-500 dark:text-gray-400">5MB max for SVG, PNG, JPG only</p>
                                                                 </div>
                                                                 <input wire:model="new_chart_image" id="new-dropzone-file" type="file" class="hidden" accept="image/*" />
+                                                                @error('new_chart_image')
+                                                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                @enderror
                                                             </label>
                                                         </div>
                                                         
@@ -95,6 +101,9 @@
                                                                     Trading Note
                                                                 </label>
                                                                 <textarea wire:model="new_note" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="6" placeholder="Enter your trading notes"></textarea>
+                                                                @error('new_note')
+                                                                    <p class="text-red-500 text-xs italic">Please enter trading note(s) for the new note.</p>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -112,6 +121,9 @@
                                                                     AI Generated Summary
                                                                 </label>
                                                                 <textarea wire:model="new_summary" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="12" placeholder="AI-generated summary will appear here" ></textarea>
+                                                                @error('new_summary')
+                                                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                @enderror
                                                             </div>
                                                         </div>
                 
@@ -148,6 +160,9 @@
                                                                         Title
                                                                     </label>
                                                                     <input wire:model="selected_title" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" type="text" placeholder="Enter title">
+                                                                    @error('selected_title')
+                                                                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                    @enderror
                                                                 </div>
                                                             </div>
                                                             
@@ -162,17 +177,20 @@
                                                                         <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG only</p>
                                                                     </div>
                                                                     <input wire:model="chart_image" id="edit-dropzone-file" type="file" class="hidden" accept="image/*" />
+                                                                    @error('chart_image')
+                                                                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                    @enderror
                                                                 </label>
                                                             </div>
                                                             
                                                             <!-- Image Preview -->
-                                                            @if ($chart_image)
+                                                            @if ($selected_chart_image)
                                                             <div class="mb-4">
                                                                 <p class="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
-                                                                @if (is_string($chart_image))
-                                                                    <img src="{{ Storage::url($chart_image) }}" alt="Chart" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
+                                                                @if (is_string($selected_chart_image))
+                                                                    <img src="{{ Storage::url($selected_chart_image) }}" alt="Chart" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
                                                                 @else
-                                                                    <img src="{{ $chart_image->temporaryUrl() }}" alt="Chart Preview" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
+                                                                    <img src="{{ $selected_chart_image->temporaryUrl() }}" alt="Chart Preview" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
                                                                 @endif
                                                             </div>
                                                             @endif
@@ -183,6 +201,9 @@
                                                                         Trading Note
                                                                     </label>
                                                                     <textarea wire:model="selected_note" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="6" placeholder="Enter your trading notes"></textarea>
+                                                                    @error('selected_note')
+                                                                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                    @enderror
                                                                 </div>
                                                             </div>
                 
@@ -200,15 +221,29 @@
                                                                         AI Generated Summary
                                                                     </label>
                                                                     <textarea wire:model="selected_summary" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" rows="12" placeholder="AI-generated summary will appear here" ></textarea>
+                                                                    @error('selected_summary')
+                                                                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                                                    @enderror
                                                                 </div>
                                                             </div>
                 
                                                             <div class="flex flex-wrap -mx-3 mb-6">
                                                                 <div class="w-full p-3 flex justify-begin">
-                                                                    <button wire:click="update" type="button" class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded border border-gray-700">
+                                                                    <!-- <button wire:click="update" type="button" class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded border border-gray-700">
+                                                                        Update Note
+                                                                    </button> -->
+                                                                    <button 
+                                                                        x-data="{}"
+                                                                        x-on:click="if (confirm('Are you sure you want to update this note? It will override the existing note.')) { $wire.update() }"
+                                                                        type="button" 
+                                                                        class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded border border-gray-700">
                                                                         Update Note
                                                                     </button>
-                                                                    <button wire:click="delete" type="button" class="ml-2 bg-white hover:bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded border border-gray-700">
+                                                                    <button 
+                                                                        x-data="{}"
+                                                                        x-on:click="if (confirm('Are you sure you want to delete this note? This action cannot be undone.')) { $wire.delete() }"
+                                                                        type="button" 
+                                                                        class="ml-2 bg-white hover:bg-red-100 text-red-700 font-bold py-2 px-4 rounded border border-red-700">
                                                                         Delete Note
                                                                     </button>
                                                                 </div>
