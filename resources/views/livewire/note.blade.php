@@ -185,14 +185,16 @@
                                                             
                                                             <!-- Image Preview -->
                                                             @if ($selected_chart_image)
-                                                            <div class="mb-4">
-                                                                <p class="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
-                                                                @if (is_string($selected_chart_image))
-                                                                    <img src="{{ Storage::url($selected_chart_image) }}" alt="Chart" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
-                                                                @else
-                                                                    <img src="{{ $selected_chart_image->temporaryUrl() }}" alt="Chart Preview" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
-                                                                @endif
-                                                            </div>
+                                                                @foreach($selected_chart_image as $image)
+                                                                <div class="mb-4">
+                                                                    <p class="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
+                                                                    @if (is_string($image))
+                                                                        <img src="{{ Storage::url($image) }}" alt="Chart" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
+                                                                    @else
+                                                                        <img src="{{ $image->temporaryUrl() }}" alt="Chart Preview" class="max-w-full h-auto max-h-64 rounded-lg shadow-md">
+                                                                    @endif
+                                                                </div>
+                                                                @endforeach
                                                             @endif
 
                                                             <div class="flex flex-wrap -mx-3 mb-6">

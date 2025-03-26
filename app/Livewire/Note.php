@@ -216,7 +216,7 @@ class Note extends Component
                 'selected_note' => 'required|min:10',
                 'chart_image' => 'nullable|image|max:5120', // 5MB max
             ]);
-    
+
             try {
                 // Create HTTP client with SSL configuration
                 $httpClient = new \GuzzleHttp\Client([
@@ -235,7 +235,18 @@ class Note extends Component
                     ['role' => 'user', 'content' => 'Please summarize this trading note by listing out possible improvements that can be considered: ' . $this->selected_note]
                 ];
                 
+                // Extract existing images from note
+                $base64Images = [];
+                if($this->selected_chart_image){
+                    foreach($this->selected_chart_image as $imagePath) {
+                        $fullPath = \Storage::disk('public')->path($imagePath);
+                        $imageData = file_get_contents($fullPath);
+                        $base64Images[] = base64_encode($imageData);
+                    }
+                }
+                
                 // If there's an image, add it to the message content
+                // Process base64Images for chart images
                 if ($this->chart_image) {
                     // If chart_image is a file upload instance
                     if (!is_string($this->chart_image)) {
@@ -245,7 +256,7 @@ class Note extends Component
                         
                         // Encode the image to base64
                         $imageData = file_get_contents($fullPath);
-                        $base64Image = base64_encode($imageData);
+                        $base64Images[] = base64_encode($imageData);
                         
                         // Clean up after use
                         $cleanupTempFile = true;
@@ -253,34 +264,37 @@ class Note extends Component
                         // It's a path to an existing image
                         $fullPath = \Storage::disk('public')->path($this->chart_image);
                         $imageData = file_get_contents($fullPath);
-                        $base64Image = base64_encode($imageData);
+                        $base64Images[] = base64_encode($imageData);
                         $cleanupTempFile = false;
                         $tempPath = null;
+                    }
+                    
+                    // Prepare message content with text
+                    $messageContent = [
+                        [
+                            'type' => 'text',
+                            'text' => 'Please summarize this trading note by listing out possible improvements that can be considered. The chart image is also attached: ' . $this->selected_note
+                        ]
+                    ];
+                    
+                    // Add each image to the message content
+                    foreach($base64Images as $base64Image) {
+                        $messageContent[] = [
+                            'type' => 'image_url',
+                            'image_url' => [
+                                'url' => "data:image/jpeg;base64,{$base64Image}"
+                            ]
+                        ];
                     }
                     
                     // Add image to messages
                     $messages = [
                         ['role' => 'system', 'content' => 'You are a helpful assistant that summarizes trading notes.'],
-                        ['role' => 'user', 'content' => [
-                            [
-                                'type' => 'text',
-                                'text' => 'Please summarize this trading note by listing out possible improvements that can be considered. The chart image is also attached: ' . $this->selected_note
-                            ],
-                            [
-                                'type' => 'image_url',
-                                'image_url' => [
-                                    'url' => "data:image/jpeg;base64,{$base64Image}"
-                                ]
-                            ]
-                        ]]
+                        ['role' => 'user', 'content' => $messageContent]
                     ];
                     
-                    // Use GPT-4 Vision model if there's an image
-                    $response = $client->chat()->create([
-                        'model' => 'gpt-4-vision-preview',
-                        'messages' => $messages,
-                        'max_tokens' => 350
-                    ]);
+                    // Set model to GPT-4 Vision
+                    $model = 'gpt-4o';
                     
                     // Clean up temporary file if needed
                     if ($cleanupTempFile && $tempPath) {
@@ -288,12 +302,16 @@ class Note extends Component
                     }
                 } else {
                     // Use regular GPT model if no image
-                    $response = $client->chat()->create([
-                        'model' => 'gpt-3.5-turbo',
-                        'messages' => $messages,
-                        'max_tokens' => 350
-                    ]);
+                    $model = 'gpt-3.5-turbo';
+                    // Keep existing messages
                 }
+                
+                // Create chat completion with appropriate model
+                $response = $client->chat()->create([
+                    'model' => $model,
+                    'messages' => $messages,
+                    'max_tokens' => 350
+                ]);
     
                 $this->selected_summary = $response->choices[0]->message->content;
                 $this->dispatch('summary-generated');
@@ -313,6 +331,6 @@ class Note extends Component
         $this->selected_summary = $this->note->summary;
         $this->selected_note = $this->note->note;
         $this->selected_aiResponse = $this->note->ai_response;
-        $this->selected_chart_image = $this->note->chart_image;
+        $this->selected_chart_image[] = $this->note->chart_image;
     }
 }
