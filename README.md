@@ -1,66 +1,53 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Trade Summarizer
+<img width="1366" height="768" alt="Image" src="https://github.com/user-attachments/assets/289cb80b-7be3-42d9-af8b-de3e446e52a7" />
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<img width="1366" height="768" alt="Image" src="https://github.com/user-attachments/assets/8fbd0d8d-5fc2-417c-8338-081bb80b634e" />
 
-## About Laravel
+<img width="1366" height="768" alt="Image" src="https://github.com/user-attachments/assets/e71f51fe-0613-44db-9b98-a2f075e7bb65" />
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Problem:
+Reading and summarizing manually each week’s trade is time consuming & requires a lot of factors to track
+## Solution:
+Create an auto summarizer program which employs OpenAI API to advises on possible improvement to be made by just inputting each day’s trade summary
+## Impact: reduction of time taken for weekly trade summary from ~1hr 17m to 8m(89.6% time saving)
+Development time: 25/12/2024-current(52 days)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Examples:
+##Input:
+Bearish confluences:
+* H4 - significant volume engulfing sell candle(bearish movement)
+* H1 - price near h1 supply & demand zone 
+* M15 - wave 4 to 5
+* H4 - extension 68%
+* H1 - bo from h1 consolidation to the downside
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Bullish confluences:
+* H4 - Wave 5 bullish
+* H1 - rising expanding wedge
 
-## Learning Laravel
+Consolidation confluences:
+* H1 - low volume buy candle(pullback for bearish)
+* H1 - price near h1 trend line
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Forecast(03/2/25): 
+Price currently is on its 3rd wave bullish this is evident by the 86% retracement level of its 2nd wave. Price is has just bo from its supply & demand zone(notated by the box).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Price is in its correction phase for m15(wave 4) evident by the formation of low volume bullish candle channel on h1. Price is shifting and is expected to retest-reject its supply and demand zone before continuing its bearish movement.
+Sell
+Will be on the look out for the SELL opportunity once H1 has shown significant sell signal(as indicated by the purple line).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3/2/25 trade: 
+Win: 1.74776% 🏆
+Win total: 1.74776%
+More to go(6%): 4.25224%
+...
+## Output:
+Possible improvements that can be considered based on the trading notes provided include:
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Being cautious of entries that show conflicting signals (both bullish and bearish).
+2. Being aware of entries that are not near major volume areas or major support/resistance levels.
+3. Considering more detailed risk management strategies to potentially minimize losses and maximize gains.
+4. Monitoring price action more closely for signs of exhaustion or potential reversals.
+5. Evaluating trade entries based on multiple time frame analyses and confluence of indicators for more robust decision-making.
+6. Implementing strict entry and exit rules based on the observed technical patterns and signals to improve trade timing.
+7. Keeping track of trade outcomes to analyze performance and adjust strategies accordingly.
