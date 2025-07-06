@@ -1,4 +1,4 @@
-# Trade Summarizer
+# Trade Summarizer: A web app to suggest improvements to be made based on you trading notes
 <img width="1366" height="768" alt="Image" src="https://github.com/user-attachments/assets/289cb80b-7be3-42d9-af8b-de3e446e52a7" />
 
 <img width="1366" height="768" alt="Image" src="https://github.com/user-attachments/assets/8fbd0d8d-5fc2-417c-8338-081bb80b634e" />
